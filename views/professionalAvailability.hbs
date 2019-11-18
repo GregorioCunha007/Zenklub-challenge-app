@@ -1,0 +1,141 @@
+{{>headers}}
+{{>logout}}
+<div style="padding:15px;">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Weekday</th>
+                <th scope="col">Start time</th>
+                <th scope="col">End time</th>
+                <th scope="col">Update entry</th>
+                <th scope="col">Delete entry</th>
+            </tr>
+        </thead>
+    
+        <tbody>
+             {{#each availabilities}}
+                <tr>
+                    <td>{{this._id}}</td>
+                    <td>{{this.weekDay}}</td>
+                    <td>{{this.startTime}}</td>
+                    <td>{{this.endTime}}</td>
+                    <td>
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalAvailabilityUpdate" data-avaid="{{this._id}}">
+                            Update
+                        </button>
+                    </td>
+                    <td>
+                        <form method="POST" id="deleteForm">   
+                            <input id="avaId" type="hidden" name="avaid" value="{{this._id}}">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {{/each}}
+        </tbody>      
+    </table>
+    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modalAvailability" data-update="false"> Create </button>
+</div>
+
+<!-- CREATE MODAL -->
+<div class="modal fade" id="modalAvailability" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Enter availability</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="./availabilities">
+            <div class="form-group">
+                <label for="_weekDay">Weekday</label>
+                <input type="text" name="weekDay" class="form-control" id="_weekDay" aria-describedby="_weekDay" placeholder="Week day">
+                <small id="_weekDay" class="form-text text-muted">Monday|Tuesday|Wenesday|Thursday|Friday</small>
+            </div>
+            <div class="form-group">
+                <label for="_startTime">Start time</label>
+                <input type="time" name="startTime" class="form-control" id="_startTime" placeholder="Start time HH:mm">
+            </div>
+            <div class="form-group">
+                <label for="_endTime">End time</label>
+                <input type="time" name="endTime" class="form-control" id="_endTime" placeholder="End time HH:mm">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- UPDATE MODAL -->
+<div class="modal fade" id="modalAvailabilityUpdate" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Update availability</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="./availabilities?_method=PUT">
+            <div class="form-group">
+                <label for="_weekDay">Weekday</label>
+                <input type="text" name="weekDay" class="form-control" id="_weekDay" aria-describedby="_weekDay" placeholder="Week day">
+                <small id="_weekDay" class="form-text text-muted">Monday|Tuesday|Wenesday|Thursday|Friday</small>
+            </div>
+            <div class="form-group">
+                <label for="_startTime">Start time</label>
+                <input type="time" name="startTime" class="form-control" id="_startTime" placeholder="Start time HH:mm">
+            </div>
+            <div class="form-group">
+                <label for="_endTime">End time</label>
+                <input type="time" name="endTime" class="form-control" id="_endTime" placeholder="End time HH:mm">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+    $('#modalAvailabilityUpdate').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        var id = button.data('avaid')             
+        let modal = $(this);   
+        $(modal).find("form").attr("action", window.location.href + '/' + id + "?_method=PUT")       
+        // AJAX GET Availability given ID
+        $.ajax({
+            type: 'GET',
+            url: window.location.href + '/' + id,  
+            success:function(data) {
+                console.log('Availability loaded');               
+                modal.find('#_weekDay').val(data.weekDay);
+                modal.find('#_startTime').val(data.startTime);
+                modal.find('#_endTime').val(data.endTime);                
+            },
+            error: function(err){
+                alert(err);
+            }
+        });
+    });
+
+    $("#deleteForm").on('submit',function(evt){
+        let avaId = $("#avaId").val();
+        $("#deleteForm").attr("action", window.location.href + '/' + avaId + '?_method=DELETE');
+    });  
+
+</script>

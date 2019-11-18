@@ -1,0 +1,172 @@
+{{>headers}}
+{{>logout}}
+<div class="row" style="margin-left:0px; margin-rigth:0px; margin-top:15px;">
+    <div class="col">
+        <label for="professionalId">Profissional</label>
+        <select class="form-control" name="professionalId" id="professionals"> </select>
+    </div>
+    <div class="col">
+        <label for="startDateInput">Start date</label>
+        <input type="date" class="form-control" name="startDate" placeholder="Start date" id="startDateInput">
+    </div>
+    <div class="col">
+        <label for="endDateInput">End date</label>
+        <input type="date" class="form-control" name="endDate" placeholder="End date" id="endDateInput">
+    </div>
+    <div class="col" style="margin-top:31px;">
+        <button class="btn btn-primary" id="searchAvailableSessions">Search</button>
+    </div>
+</div>
+
+<div class="row" style="margin-left:0px; margin-rigth:0px; margin-top:50px;visibility:collapse;" id="bookSessions">
+    <div class="col-sm-12">
+        <span class="text-danger" id="bookSessionsEmptyMessage"> The professional has no availability </span>
+    </div>        
+    <div class="col-sm-3" id="picker">
+        <label for="dayPickerSelect">Select day</label>
+        <select class="form-control" name="day" id="dayPickerSelect"> </select>
+    </div>
+    <div class="col-sm-2" id="timePicker">
+        <label for="timePickerSelect">Select time</label>
+        <select class="form-control" name="startTime" id="timePickerSelect"> </select>
+    </div>
+    <div class="col-sm-2" style="margin-top:31px;">
+        <button class="btn btn-success" id="bookSession">Book session!</button>
+    </div>
+</div>
+<h4 class="col" style="margin-top:25px;"> My sessions </h4>
+<div class="row" style="margin-left:0px; margin-rigth:0px; margin-top:25px;">
+    <div class="col-sm-4" id="mySessions">
+        
+    </div>
+</div>
+
+
+<script>
+    let sessionsData = {};
+    let mySessions = {};
+
+    function getSessions(){
+        $.ajax({
+            type: 'GET',
+            url: 'sessions',  
+            success:function(data) {
+                if (data){
+                    mySessions = data;
+                    refreshSessions();
+                }                                
+            },
+            error: function(xhr){
+                alert('Could not get sessions');
+                console.log(xhr);
+            }
+        });
+    }
+
+    function getProfessionals(){
+        $.ajax({
+            type: 'GET',
+            url: 'professionals',  
+            success:function(data) {
+                if (data){
+                    jQuery.each(data, function(){
+                        $('<option>', { 'value':this.id, 'text':this.name }).appendTo($('#professionals'));
+                    });
+                }                                
+            },
+            error: function(xhr){
+                alert('Could not get professionals');
+                console.log(xhr);
+            }
+        });
+    }
+
+    function refreshTimePicker(slots){
+        $('#timePickerSelect').empty();
+        jQuery.each(slots, function(key, status){
+            let opt = $('<option>', { 'value':key, 'text':key + '-' + status });
+            if (status != 'Available') opt.attr('disabled', 'disabled');
+            opt.appendTo($('#timePickerSelect'));
+        });
+    }
+
+    function refreshSessions(){
+        $("#mySessions").empty();
+        jQuery.each(mySessions, function(){
+            $("#mySessions").append($('<p>').html("Session in " + this.day + " at " + this.startTime + " with " + this.professionalName));
+        });
+    }
+
+    function refreshAvailableSessions(){
+        let init = false;                                  
+        $("#bookSessions").css('visibility','visible'); 
+        $("#bookSessionsEmptyMessage").css('visibility', 'visible');
+        // Clear all days inside select
+        $('#dayPickerSelect').empty();
+        jQuery.each(sessionsData, function(key, slots){
+            $("#bookSessionsEmptyMessage").css('visibility', 'hidden');
+            let opt = $('<option>', { 'value':key, 'text':key });
+            opt.appendTo($('#dayPickerSelect'));
+            if(!init){
+                refreshTimePicker(slots);
+                init = true;
+            }                   
+        });
+    }
+
+    function getAvailableSessions(){
+        $.ajax({
+            type: 'GET',
+            url: 'slots',  
+            data: {
+                startDate: $("#startDateInput").val(),
+                endDate: $("#endDateInput").val(),
+                professionalId: $("#professionals").val()
+            },
+            success:function(data) {
+                sessionsData = data;
+                refreshAvailableSessions();                
+            },
+            error:function(xhr){
+                alert('Could search for the slots');
+                console.log(xhr);
+            }
+        });
+    }
+
+    $('#searchAvailableSessions').on('click', function(evt){
+        getAvailableSessions();
+    });
+
+    $("#dayPickerSelect").on('change', function(){
+        let slots = sessionsData[this.value];
+        refreshTimePicker(slots);
+    });
+
+    $("#bookSession").on('click', function(evt){
+        $.ajax({
+            type: 'POST',
+            url: 'sessions', 
+            data:{
+                day: $('#dayPickerSelect').val(),
+                startTime: $('#timePickerSelect').val(),
+                professionalId: $('#professionals').val()
+            }, 
+            success:function(data) {
+                if (data && data.sessions){
+                    mySessions = data.sessions;
+                    getAvailableSessions();
+                    refreshSessions();
+                    refreshTimePicker(sessionsData[$("#dayPickerSelect").val()]);
+                }                                
+            },
+            error: function(xhr){
+                alert('Could not book the session');
+                console.log(xhr);
+            }
+        });
+    });
+
+    window.onload = getSessions();
+    window.onload = getProfessionals();    
+</script>

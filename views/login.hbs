@@ -1,0 +1,23 @@
+{{>headers}}
+<div class="container">
+    <div class="h-100 row align-items-center">   
+        <div class="col">
+            <h4> Login </h4>
+            {{#if messages}}
+                <span class="text-danger">{{messages.error}}</span>
+            {{/if}}
+            <form action="/login" method="POST">           
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <input type="email" class="form-control" name="email" id="email" aria-describedby="emailHelp" placeholder="Enter email">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+            <a href="/register"> Still not a member? Register here! </a>
+        </div>    
+    </div>
+</div>
