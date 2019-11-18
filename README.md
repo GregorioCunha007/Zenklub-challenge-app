@@ -1,9 +1,5 @@
 # Zenklub-challenge-app
 
-Requirements:
-
-node.js version >= 12
-
 Install:
 
 npm install
@@ -11,3 +7,5 @@ npm install
 Run:
 
 node index.js
+
+Open browser in localhost:3000
