@@ -8,4 +8,5 @@ Run:
 
 node index.js
 
-Open browser in localhost:3000
+Server will start listening in the port described by the logs in console.
+Open browser in localhost:portnumber 
