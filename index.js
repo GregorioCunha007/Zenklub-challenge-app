@@ -70,8 +70,7 @@ app.get('/register', checkNotAuthenticated, (req, res) => {
 
 app.post('/register', checkNotAuthenticated, async (req, res) => {
     try {
-        // await cause tryRegister is async
-        await userController.tryRegister(req.body);
+        userController.tryRegister(req.body);
         res.redirect('/login');
     } catch (error) {
         res.redirect('/register');

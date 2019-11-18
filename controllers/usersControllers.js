@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('../utils/custom-bcrypt.js');
 
 const professionalController = require('./professionalsController.js');
 
@@ -9,9 +9,9 @@ let usersArray = [];
  * Tries to create an user client or professional
  * @param {*} data User credentials { email, password }
  */
-async function tryRegister (data) {
+function tryRegister (data) {
     try {
-        const hashedPassword = await bcrypt.hash(data.password, 10);
+        const hashedPassword = bcrypt.hash(data.password);
         let userId = Date.now().toString();
         usersArray.push({
             id: userId,

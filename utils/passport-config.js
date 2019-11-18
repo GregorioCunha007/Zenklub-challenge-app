@@ -1,6 +1,6 @@
 const LocalStrategy = require('passport-local').Strategy
-const bcrypt = require('bcrypt')
-const userController = require('../controllers/usersControllers');
+const bcrypt = require('./custom-bcrypt.js')
+const userController = require('../controllers/usersControllers.js');
 
 /**
  * Initialize passport configurations
@@ -9,13 +9,13 @@ const userController = require('../controllers/usersControllers');
  * @param {*} getUserById Function to get an User given his Id
  */
 function initialize(passport, getUserByEmail, getUserById) {
-    const authenticateUser = async (email, password, done) => {
+    const authenticateUser = (email, password, done) => {
         const user = getUserByEmail(email);
         if (user == null) {
             return done(null, false, { message: 'No user with that email' });
         }
         try {
-            if (await bcrypt.compare(password, user.password)) {
+            if (bcrypt.compare(password, user.password)) {
                 // Successfull login
                 return done(null, user);
             } else {
