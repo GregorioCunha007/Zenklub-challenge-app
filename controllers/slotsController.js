@@ -13,7 +13,7 @@ var allSlotsBetweenPeriods = function(startDate, endDate, availablePeriods) {
     var lastDate = moment(endDate).startOf('day');
     do {
         // Check if the current date is a desirable week day
-        let period = availablePeriods.find(p => p.weekDay == currDate.format('dddd'));
+        let period = Object.values(availablePeriods).find(p => p.weekDay == currDate.format('dddd'));
         if (period) {
             var startHours = parseInt(period.startTime.split(":")[0]); 
             // Subtract by 1 because all sessions have 1 hour duration
