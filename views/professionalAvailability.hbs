@@ -26,11 +26,11 @@
                             Update
                         </button>
                     </td>
-                    <td>
-                        <form method="POST" id="deleteForm">   
+                    <td>                        
+                        <form method="POST">   
                             <input id="avaId" type="hidden" name="avaid" value="{{this._id}}">
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
+                            <button type="submit" class="btn btn-danger" onclick="deleteFormClicked(this,{{this._id}})">Delete</button>
+                        </form> 
                     </td>
                 </tr>
             {{/each}}
@@ -133,9 +133,14 @@
         });
     });
 
-    $("#deleteForm").on('submit',function(evt){
+    $(".deleteForm").on('submit',function(evt){
         let avaId = $("#avaId").val();
-        $("#deleteForm").attr("action", window.location.href + '/' + avaId + '?_method=DELETE');
+        console.log(window.location.href + '/' + avaId + '?_method=DELETE');
+        $(".deleteForm").attr("action", window.location.href + '/' + avaId + '?_method=DELETE');
     });  
+
+    function deleteFormClicked(evt, id) {
+        $($(evt).parent()[0]).attr("action", window.location.href + '/' + id + '?_method=DELETE');
+    }
 
 </script>
